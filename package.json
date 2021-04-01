@@ -4,6 +4,9 @@
   "description": "A console logger for CLIs using react-ink.",
   "author": "Lucas Caro",
   "main": "dist/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build:types": "tsc -p .",
     "build:babel": "babel src --out-dir dist --extensions '.ts,.tsx' --ignore 'src/**/__tests__/**' --source-maps",
