@@ -1,7 +1,10 @@
+import { SpinnerName as _SpinnerName } from "cli-spinners";
+
+export type SpinnerName = _SpinnerName;
+
 export interface ConsoleManagerState {
   log: React.ReactElement[];
   currentTask?: React.ReactElement;
-  showSpinner?: boolean;
 }
 
 export enum ConsoleActionType {
@@ -18,7 +21,6 @@ export interface ConsoleLogAction {
 export interface ConsoleSetTaskAction {
   type: ConsoleActionType.SET_TASK;
   message: React.ReactElement;
-  withSpinner?: boolean;
 }
 
 export type ConsoleReducer = (state: ConsoleManagerState, action: ConsoleAction) => ConsoleManagerState;
@@ -31,7 +33,10 @@ export const reducer: ConsoleReducer = (state, action) => {
       log[state.log.length] = action.message;
       return { ...state, log };
     case ConsoleActionType.SET_TASK:
-      return { ...state, currentTask: action.message, showSpinner: action.withSpinner };
+      return {
+        ...state,
+        currentTask: action.message,
+      };
     default:
       // Exhaustive check.
       const _: never = action;
@@ -44,8 +49,7 @@ export const logAction = (message: React.ReactElement): ConsoleLogAction => ({
   message,
 });
 
-export const setTaskAction = (message: React.ReactElement, withSpinner?: boolean): ConsoleSetTaskAction => ({
+export const setTaskAction = (message: React.ReactElement): ConsoleSetTaskAction => ({
   type: ConsoleActionType.SET_TASK,
   message,
-  withSpinner,
 });

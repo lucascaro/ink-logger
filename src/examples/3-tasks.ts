@@ -1,4 +1,7 @@
 import { consoleManager } from "..";
+import { promisify } from "util";
+
+const waitms = promisify((ms: number, cb: Function) => setTimeout(() => cb(null), ms));
 
 /**
  * Simples use of this library.
@@ -12,27 +15,35 @@ import { consoleManager } from "..";
   cm.log(`This is a log message`);
 
   // Set the current task, with a spinner.
-  cm.setTask(`Working`, true);
+  const firstTask = cm.startTask(`Working`, true);
 
-  let nlogs = 0;
-  const interval = setInterval(() => {
-    nlogs++;
-    // Log something every 100ms
-    if (nlogs % 3 === 0) {
-      cm.warn(`${nlogs} some warning`);
-    } else if (nlogs % 5 === 0) {
-      cm.error(`${nlogs} something failed`);
-    } else {
-      cm.success(`${nlogs} some sub-task's output`);
-    }
-    if (nlogs === 10) {
-      clearInterval(interval);
-      // After all tasks are done, set a final task with no spinner to end.
-      cm.setTask("All tasks done", false);
+  // Do some logging
+  await waitms(300);
+  cm.success(`some sub-task's output`);
+  await waitms(300);
+  cm.warn(`some warning`);
+  await waitms(300);
+  cm.success(`some sub-task's output`);
+  await waitms(300);
+  cm.error(`something failed`);
+  await waitms(300);
+  cm.success(`some sub-task's output`);
+  await waitms(300);
+  cm.success(`some sub-task's output`);
+  await waitms(300);
+  cm.success(`some sub-task's output`);
+  await waitms(300);
+  cm.success(`some sub-task's output`);
+  await waitms(300);
+  // You can also set a different spinner
+  const secondTask = cm.startTask(`Finishing`, "pong");
+  await waitms(1000);
+  firstTask.end();
+  await waitms(2000);
 
-      // Or use clearTask()
-      cm.log("All tasks done");
-      cm.clearTask();
-    }
-  }, 100);
+  cm.log("All tasks done");
+  // After all tasks are done, the program exits.
+  secondTask.end();
+  // or clear all remaining tasks by running:
+  cm.clearTasks();
 })();

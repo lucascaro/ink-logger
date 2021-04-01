@@ -19,16 +19,7 @@ export const ConsoleComponent: React.FC<ConsoleProps> = ({ onDispatch }) => {
   return (
     <>
       <Static items={state.log}>{(line, i) => <Text key={i}>{line}</Text>}</Static>
-      {state.currentTask && (
-        <Box>
-          {state.showSpinner && (
-            <Box marginRight={1}>
-              <Spinner />
-            </Box>
-          )}
-          {state.currentTask && <Box>{state.currentTask}</Box>}
-        </Box>
-      )}
+      {state.currentTask && <Box flexDirection="column">{state.currentTask}</Box>}
     </>
   );
 };

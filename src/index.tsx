@@ -1,13 +1,15 @@
-import { Box, Instance, Newline, render, Text } from "ink";
+import { Box, Instance, Newline, render, Spacer, Text } from "ink";
 import { Dispatch } from "react";
 import { ConsoleComponent, logAction, setTaskAction } from "./components/console";
-import { ConsoleAction } from "./components/console/reducer";
+import { ConsoleAction, SpinnerName } from "./components/console/reducer";
 import { LogLine } from "./components/console/log-line";
-import { Color } from "chalk";
+import Spinner from "ink-spinner";
 
 export interface Task {
-  name: string;
-  done: boolean;
+  messages: string[];
+  withSpinner: boolean;
+  spinnerType?: SpinnerName;
+  end: () => void;
 }
 
 enum LogLevel {
@@ -31,8 +33,8 @@ export interface ConsoleManager {
   success: (message: string) => void;
   error: (message: string) => void;
   warn: (message: string) => void;
-  setTask: (messages?: string | string[], withSpinner?: boolean) => void;
-  clearTask: () => void;
+  startTask: (messages: string | string[], withSpinner: boolean | SpinnerName) => Task;
+  clearTasks: () => void;
 }
 
 const defaultOptions: ConsoleManagerOptions = {
@@ -88,24 +90,31 @@ function newConsoleManager(dispatch: Dispatch<ConsoleAction>, options: ConsoleMa
     return p;
   }, {} as { [k in LogLevel]: string[] });
 
+  const tasks: Set<Task> = new Set();
+
   const self: ConsoleManager = {
-    clearTask() {
-      self.setTask();
+    clearTasks() {
+      tasks.clear();
+      updateTasks(dispatch, tasks);
     },
-    setTask(messages = [], withSpinner = false) {
+    startTask(messages = [], withSpinner = false) {
       if (typeof messages === "string") {
         messages = [messages];
       }
-      dispatch(
-        setTaskAction(
-          <Box justifyContent="space-between" width="100%">
-            {messages.map((message, i) => (
-              <Text key={i}>{message}</Text>
-            ))}
-          </Box>,
-          withSpinner,
-        ),
-      );
+      const spinnerType = withSpinner && typeof withSpinner !== "boolean" ? withSpinner : undefined;
+      const task: Task = {
+        messages,
+        withSpinner: !!withSpinner,
+        spinnerType,
+        end: () => {
+          tasks.delete(task);
+          updateTasks(dispatch, tasks);
+        },
+      };
+      tasks.add(task);
+
+      updateTasks(dispatch, tasks);
+      return task;
     },
     log: logDisplatcher(...formats[LogLevel.log]),
     info: logDisplatcher(...formats[LogLevel.info]),
@@ -123,4 +132,27 @@ function mergeOptions(a: ConsoleManagerOptions, b: ConsoleManagerPartialOptions 
     merged[key] = { ...a[key], ...b[key] };
   }
   return merged;
+}
+
+function updateTasks(dispatch: Dispatch<ConsoleAction>, tasks: Set<Task>): void {
+  dispatch(
+    setTaskAction(
+      <Box flexDirection="column">
+        {Array.from(tasks.values()).map((task, i) => (
+          <Box key={i}>
+            {task.withSpinner && (
+              <Box marginRight={1}>
+                <Spinner type={task.spinnerType} />
+              </Box>
+            )}
+            <Box justifyContent="space-between">
+              {task.messages.map((message, i) => (
+                <Text key={i}>{message}</Text>
+              ))}
+            </Box>
+          </Box>
+        ))}
+      </Box>,
+    ),
+  );
 }
