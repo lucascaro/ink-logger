@@ -1,4 +1,3 @@
-import { parseBucketAndPrefix } from "../s3";
 import { Timers } from "../timers";
 
 describe("timers", () => {
