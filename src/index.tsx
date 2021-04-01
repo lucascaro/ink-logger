@@ -1,14 +1,14 @@
 import { Box, Instance, Newline, render, Spacer, Text } from "ink";
 import { Dispatch } from "react";
-import { ConsoleComponent, logAction, setTaskAction } from "./components/console";
-import { ConsoleAction, SpinnerName } from "./components/console/reducer";
+import { ConsoleComponent, logAction, setTasksAction } from "./components/console";
+import { ConsoleAction, SpinnerName, TaskDefinition } from "./components/console/reducer";
 import { LogLine } from "./components/console/log-line";
 import Spinner from "ink-spinner";
 
 export interface Task {
   messages: string[];
   withSpinner: boolean;
-  spinnerType?: SpinnerName;
+  spinnerName?: SpinnerName;
   end: () => void;
 }
 
@@ -105,7 +105,7 @@ function newConsoleManager(dispatch: Dispatch<ConsoleAction>, options: ConsoleMa
       const task: Task = {
         messages,
         withSpinner: !!withSpinner,
-        spinnerType,
+        spinnerName: spinnerType,
         end: () => {
           tasks.delete(task);
           updateTasks(dispatch, tasks);
@@ -136,23 +136,19 @@ function mergeOptions(a: ConsoleManagerOptions, b: ConsoleManagerPartialOptions 
 
 function updateTasks(dispatch: Dispatch<ConsoleAction>, tasks: Set<Task>): void {
   dispatch(
-    setTaskAction(
-      <Box flexDirection="column">
-        {Array.from(tasks.values()).map((task, i) => (
-          <Box key={i}>
-            {task.withSpinner && (
-              <Box marginRight={1}>
-                <Spinner type={task.spinnerType} />
-              </Box>
-            )}
+    setTasksAction(
+      Array.from(tasks).map(
+        (task): TaskDefinition => ({
+          ...task,
+          message: (
             <Box justifyContent="space-between">
               {task.messages.map((message, i) => (
                 <Text key={i}>{message}</Text>
               ))}
             </Box>
-          </Box>
-        ))}
-      </Box>,
+          ),
+        }),
+      ),
     ),
   );
 }

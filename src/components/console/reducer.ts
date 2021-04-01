@@ -4,23 +4,29 @@ export type SpinnerName = _SpinnerName;
 
 export interface ConsoleManagerState {
   log: React.ReactElement[];
-  currentTask?: React.ReactElement;
+  tasks?: TaskDefinition[];
 }
 
 export enum ConsoleActionType {
   LOG,
-  SET_TASK,
+  SET_TASKS,
 }
 
-export type ConsoleAction = ConsoleLogAction | ConsoleSetTaskAction;
+export type ConsoleAction = ConsoleLogAction | ConsoleSetTasksAction;
 
 export interface ConsoleLogAction {
   type: ConsoleActionType.LOG;
   message: React.ReactElement;
 }
-export interface ConsoleSetTaskAction {
-  type: ConsoleActionType.SET_TASK;
+
+export interface TaskDefinition {
   message: React.ReactElement;
+  withSpinner?: boolean;
+  spinnerName?: SpinnerName;
+}
+export interface ConsoleSetTasksAction {
+  type: ConsoleActionType.SET_TASKS;
+  tasks: TaskDefinition[];
 }
 
 export type ConsoleReducer = (state: ConsoleManagerState, action: ConsoleAction) => ConsoleManagerState;
@@ -32,10 +38,10 @@ export const reducer: ConsoleReducer = (state, action) => {
       // Use sparse arrays for the log, anticipating large numbers of logs.
       log[state.log.length] = action.message;
       return { ...state, log };
-    case ConsoleActionType.SET_TASK:
+    case ConsoleActionType.SET_TASKS:
       return {
         ...state,
-        currentTask: action.message,
+        tasks: action.tasks,
       };
     default:
       // Exhaustive check.
@@ -49,7 +55,7 @@ export const logAction = (message: React.ReactElement): ConsoleLogAction => ({
   message,
 });
 
-export const setTaskAction = (message: React.ReactElement): ConsoleSetTaskAction => ({
-  type: ConsoleActionType.SET_TASK,
-  message,
+export const setTasksAction = (tasks: TaskDefinition[]): ConsoleSetTasksAction => ({
+  type: ConsoleActionType.SET_TASKS,
+  tasks,
 });
