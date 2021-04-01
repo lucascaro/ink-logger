@@ -31,7 +31,7 @@ export interface ConsoleManager {
   success: (message: string) => void;
   error: (message: string) => void;
   warn: (message: string) => void;
-  setTask: (messages: string[], withSpinner?: boolean) => void;
+  setTask: (messages?: string | string[], withSpinner?: boolean) => void;
   clearTask: () => void;
 }
 
@@ -90,9 +90,12 @@ function newConsoleManager(dispatch: Dispatch<ConsoleAction>, options: ConsoleMa
 
   const self: ConsoleManager = {
     clearTask() {
-      self.setTask([]);
+      self.setTask();
     },
-    setTask(messages, withSpinner = false) {
+    setTask(messages = [], withSpinner = false) {
+      if (typeof messages === "string") {
+        messages = [messages];
+      }
       dispatch(
         setTaskAction(
           <Box justifyContent="space-between" width="100%">
