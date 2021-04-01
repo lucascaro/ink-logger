@@ -1,0 +1,52 @@
+{
+  "name": "@lucascaro/ink-logger",
+  "version": "1.0.0",
+  "description": "A console logger for CLIs using react-ink.",
+  "author": "Lucas Caro",
+  "main": "dist/index.js",
+  "scripts": {
+    "build:types": "tsc -p .",
+    "build:babel": "babel src --out-dir dist --extensions '.ts,.tsx' --ignore 'src/**/__tests__/**' --source-maps",
+    "build:clean": "rm -rf dist/*",
+    "watch": "npm run build:babel -- --watch",
+    "build": "npm run build:clean && npm run build:types && npm run build:babel",
+    "lint:fix": "eslint --fix src/**/*.ts",
+    "lint": "eslint src/**/*.ts*",
+    "prepublishOnly": "npm run build",
+    "release": "npm version patch && npm publish",
+    "test:watch": "jest --watch",
+    "test": "jest"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.13.0",
+    "@babel/core": "^7.13.8",
+    "@babel/preset-env": "^7.13.9",
+    "@babel/preset-react": "^7.12.13",
+    "@babel/preset-typescript": "^7.13.0",
+    "@types/chalk": "^2.2.0",
+    "@types/jest": "^26.0.20",
+    "@types/node": "^14.14.32",
+    "@types/react": "^17.0.3",
+    "@typescript-eslint/eslint-plugin": "^4.16.1",
+    "@typescript-eslint/parser": "^4.16.1",
+    "eslint": "^7.21.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "ink": "^3.0.8",
+    "ink-spinner": "^4.0.1",
+    "ink-testing-library": "^2.1.0",
+    "jest": "^26.6.3",
+    "prettier": "^2.2.1",
+    "react": "^17.0.1",
+    "ts-jest": "^26.5.3",
+    "typescript": "^4.2.3"
+  },
+  "peerDependencies": {},
+  "dependencies": {
+    "ink": "^3.0.8",
+    "ink-spinner": "^4.0.1",
+    "react": "^17.0.1"
+  }
+}
