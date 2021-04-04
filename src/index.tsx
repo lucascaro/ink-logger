@@ -1,9 +1,9 @@
 import { Box, Instance, Newline, render, Spacer, Text } from "ink";
 import { Dispatch } from "react";
-import { ConsoleComponent, logAction, setTasksAction } from "./components/console";
-import { ConsoleAction, SpinnerName, TaskDefinition } from "./components/console/reducer";
+import { ConsoleComponent, ConsoleAction, logAction, setTasksAction, textInputAction } from "./components/console";
+import { SpinnerName, TaskDefinition } from "./components/console/reducer";
 import { LogLine } from "./components/console/log-line";
-import Spinner from "ink-spinner";
+import { promisify } from "util";
 
 export interface Task {
   messages: string[];
@@ -35,6 +35,7 @@ export interface ConsoleManager {
   warn: (message: string) => void;
   startTask: (messages: string | string[], withSpinner: boolean | SpinnerName) => Task;
   clearTasks: () => void;
+  inputText: (prompt: string, defVal: string, placeholder: string) => Promise<string>;
 }
 
 const defaultOptions: ConsoleManagerOptions = {
@@ -115,6 +116,11 @@ function newConsoleManager(dispatch: Dispatch<ConsoleAction>, options: ConsoleMa
 
       updateTasks(dispatch, tasks);
       return task;
+    },
+    inputText(prompt, defVal, placeholder) {
+      return new Promise((resolve) => {
+        dispatch(textInputAction(prompt, defVal, placeholder, (err, val) => resolve(val)));
+      });
     },
     log: logDisplatcher(...formats[LogLevel.log]),
     info: logDisplatcher(...formats[LogLevel.info]),

@@ -50,6 +50,7 @@
   "dependencies": {
     "ink": "^3.0.8",
     "ink-spinner": "^4.0.1",
+    "ink-text-input": "^4.0.1",
     "react": "^17.0.1"
   }
 }

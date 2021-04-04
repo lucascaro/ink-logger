@@ -2,8 +2,9 @@ import { Box, Static, Text } from "ink";
 import React, { Dispatch, useReducer } from "react";
 import Spinner from "ink-spinner";
 import { ConsoleAction, ConsoleManagerState, reducer } from "./reducer";
+import { Input } from "../input";
 
-export { ConsoleLogAction, logAction, setTasksAction } from "./reducer";
+export { ConsoleAction, logAction, setTasksAction, textInputAction } from "./reducer";
 
 const initialState: ConsoleManagerState = {
   log: [],
@@ -32,6 +33,20 @@ export const ConsoleComponent: React.FC<ConsoleProps> = ({ onDispatch }) => {
             </Box>
           ))}
         </Box>
+      )}
+      {state.input && (
+        <Input
+          prompt={state.input.prompt}
+          defaultValue={state.input.defVal}
+          placeholder={state.input.placeholder}
+          onSubmit={(val) => {
+            if (state.input) {
+              const { callback } = state.input;
+              state.input = undefined;
+              callback(null, val);
+            }
+          }}
+        />
       )}
     </>
   );
